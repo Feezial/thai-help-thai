@@ -1,26 +1,225 @@
 @import "tailwindcss";
 
+/* ===== ธีมฟ้า-ขาว คลีน สบายตา ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #eaf1fb;
+  --bg-accent: #dce9fc;
+  --surface: #ffffff;
+  --surface-2: #f4f8fe;
+  --ink: #122038;
+  --ink-soft: #5a6b86;
+  --ink-faint: #97a3ba;
+  --blue: #2f6bed;
+  --blue-deep: #1c50c6;
+  --blue-050: #e9f0fe;
+  --blue-100: #d7e4fd;
+  --line: #e8eef8;
+  --line-strong: #d6e0f0;
+  --warn-bg: #fff5e4;
+  --warn-ink: #97580a;
+  --warn-line: #f2cd8d;
+  --teal: #0d9488;
+  --teal-bg: #e2f5f1;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-accent: var(--bg-accent);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-blue: var(--blue);
+  --color-blue-deep: var(--blue-deep);
+  --color-blue-050: var(--blue-050);
+  --color-blue-100: var(--blue-100);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-ink: var(--warn-ink);
+  --color-warn-line: var(--warn-line);
+  --color-teal: var(--teal);
+  --color-teal-bg: var(--teal-bg);
+  --font-display: var(--font-kanit), system-ui, sans-serif;
+  --font-sans: var(--font-kanit), system-ui, sans-serif;
+  --font-mono: var(--font-kanit), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  background-image:
+    radial-gradient(110% 60% at 50% -5%, var(--bg-accent), transparent 70%);
+  background-attachment: fixed;
+}
+
+/* ===== กรอบแอป (จำลองหน้าจอมือถือบนเดสก์ท็อป) ===== */
+.app-frame {
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== การ์ดสีขาวลอยบนพื้นฟ้า ===== */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow:
+    0 1px 2px rgba(18, 32, 56, 0.04),
+    0 12px 30px -16px rgba(28, 80, 198, 0.22);
+}
+
+.figure {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ===== ปุ่มหลัก ===== */
+.btn-primary {
+  background-image: linear-gradient(180deg, var(--blue) 0%, var(--blue-deep) 100%);
+  color: #fff;
+  box-shadow:
+    0 8px 18px -8px rgba(28, 80, 198, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.18s ease,
+    opacity 0.15s ease;
+}
+.btn-primary:active {
+  transform: translateY(1px) scale(0.99);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ===== อินพุต ===== */
+.field {
+  background-color: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--blue);
+  background-color: var(--surface);
+  box-shadow: 0 0 0 4px rgba(47, 107, 237, 0.15);
+}
+.field::placeholder {
+  color: var(--ink-faint);
+}
+.field::-webkit-outer-spin-button,
+.field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ===== แท็บแบบ segmented ===== */
+.seg {
+  position: relative;
+  background-color: var(--blue-050);
+}
+/* แถบ pill สีขาวที่เลื่อนไปมาใต้แท็บ */
+.seg-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 6px);
+  border-radius: 0.75rem;
+  background-color: var(--surface);
+  box-shadow: 0 2px 8px -2px rgba(18, 32, 56, 0.18);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.seg-indicator[data-pos="1"] {
+  transform: translateX(calc(100% + 4px));
+}
+.seg-item {
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s ease;
+  color: var(--ink-soft);
+}
+.seg-item[data-active="true"] {
+  color: var(--blue-deep);
+}
+
+/* ===== แถบนำทางล่าง (floating) ===== */
+.nav-bar {
+  background-color: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 34px -18px rgba(28, 80, 198, 0.4);
+}
+.nav-item {
+  color: var(--ink-faint);
+  transition: color 0.18s ease;
+}
+.nav-item[data-active="true"] {
+  color: var(--blue);
+}
+
+/* ===== แอนิเมชัน ===== */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop {
+  0% { opacity: 0.4; transform: translateY(3px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes itemOut {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateX(22px) scale(0.96); }
+}
+@keyframes iconPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@keyframes successPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.rise { opacity: 0; animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.pop { animation: pop 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.view-enter { animation: fadein 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.item-enter { animation: itemIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.item-exit { animation: itemOut 0.26s ease forwards; pointer-events: none; }
+.icon-pop { animation: iconPop 0.35s ease; }
+.btn-saved {
+  background-image: linear-gradient(180deg, #18a558 0%, #138048 100%);
+  animation: successPop 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .pop, .view-enter, .item-enter, .item-exit, .icon-pop {
+    animation: none;
+    opacity: 1;
+  }
 }
