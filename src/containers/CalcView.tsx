@@ -20,6 +20,10 @@ const MODE_OPTIONS: readonly [SegOption<Mode>, SegOption<Mode>] = [
   { value: "reverse", label: "ซื้อได้สูงสุด" },
 ];
 
+function round2(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
 export function CalcView({
   usedToday,
   usedMonth,
@@ -34,21 +38,37 @@ export function CalcView({
   const [mode, setMode] = useState<Mode>("discount");
   const [price, setPrice] = useState("");
   const [justSaved, setJustSaved] = useState(false);
+  // สิทธิ์เหลือวันนี้ที่ผู้ใช้ปรับเอง — null = ใช้ค่าจากประวัติ (auto)
+  const [manualRemaining, setManualRemaining] = useState<string | null>(null);
+
+  // ค่าจากประวัติ; ถ้าผู้ใช้กรอกเองให้ใช้ค่าที่กรอก
+  const derivedRemainingToday = Math.max(0, DAILY_CAP - usedToday);
+  const remainingTodayStr = manualRemaining ?? String(derivedRemainingToday);
+  const effectiveRemainingToday = Math.min(
+    DAILY_CAP,
+    Math.max(0, parseAmount(remainingTodayStr)),
+  );
+  const effectiveUsedToday = DAILY_CAP - effectiveRemainingToday;
 
   const discount = useMemo(
-    () => calcDiscount({ price: parseAmount(price), usedToday, usedMonth }),
-    [price, usedToday, usedMonth],
+    () =>
+      calcDiscount({ price: parseAmount(price), usedToday: effectiveUsedToday, usedMonth }),
+    [price, effectiveUsedToday, usedMonth],
   );
 
   const remainingNow = Math.max(
     0,
-    Math.min(DAILY_CAP - usedToday, MONTHLY_CAP - usedMonth),
+    Math.min(DAILY_CAP - effectiveUsedToday, MONTHLY_CAP - usedMonth),
   );
   const reverse = useMemo(() => calcReverse(remainingNow), [remainingNow]);
 
   function handleSave() {
     if (discount.price <= 0) return;
     onSave(discount.price, discount.govPays, discount.youPay);
+    // ถ้าผู้ใช้กรอกสิทธิ์เหลือเอง ให้หักออกตามที่รัฐช่วยรอบนี้ (กรณี auto ประวัติจะหักให้เอง)
+    if (manualRemaining !== null) {
+      setManualRemaining(String(Math.max(0, round2(effectiveRemainingToday - discount.govPays))));
+    }
     setPrice("");
     setJustSaved(true);
     window.setTimeout(() => setJustSaved(false), 1800);
@@ -75,6 +95,20 @@ export function CalcView({
               onChange={(v) => setPrice(sanitizeAmount(v))}
               placeholder="0"
             />
+
+            <div className="mt-4">
+              <Field
+                id="remaining-today"
+                label="สิทธิ์ที่เหลือวันนี้"
+                value={remainingTodayStr}
+                onChange={(v) => setManualRemaining(sanitizeAmount(v))}
+                suffix={`/ ${DAILY_CAP}`}
+                size="sm"
+              />
+              <p className="mt-1.5 text-[11px] text-ink-faint">
+                ปกติวันละ ฿{formatBaht(DAILY_CAP)} · เพิ่งเข้ามาครั้งแรกปรับให้ตรงสิทธิ์จริงได้
+              </p>
+            </div>
 
             <div className="mt-5 flex items-end justify-between border-t border-line pt-5">
               <div>
@@ -127,7 +161,7 @@ export function CalcView({
             </button>
           </div>
 
-          <QuotaBars usedToday={usedToday} usedMonth={usedMonth} onClick={goHistory} />
+          <QuotaBars usedToday={effectiveUsedToday} usedMonth={usedMonth} onClick={goHistory} />
         </div>
       ) : (
         <div className="view-enter">
@@ -147,7 +181,7 @@ export function CalcView({
             </div>
           </div>
 
-          <QuotaBars usedToday={usedToday} usedMonth={usedMonth} onClick={goHistory} />
+          <QuotaBars usedToday={effectiveUsedToday} usedMonth={usedMonth} onClick={goHistory} />
         </div>
       )}
     </div>
