@@ -35,8 +35,6 @@ export function CalcView({
   const [mode, setMode] = useState<Mode>("discount");
   const [price, setPrice] = useState("");
   const [justSaved, setJustSaved] = useState(false);
-
-  // สิทธิ์ที่เหลือวัน/เดือน — เริ่มจากประวัติ แต่ผู้ใช้ปรับเองได้
   const daily = useManualRemaining(Math.max(0, DAILY_CAP - usedToday), DAILY_CAP);
   const monthly = useManualRemaining(
     Math.max(0, MONTHLY_CAP - usedMonth),
@@ -114,7 +112,7 @@ export function CalcView({
               <div>
                 <p className="text-sm font-medium text-ink-soft">คุณจ่ายเอง</p>
                 <p className="mt-0.5 text-[11px] text-ink-faint">
-                  {Math.round(discount.effectiveDiscountPct * 100)}% ของยอด
+                  {/* {Math.round(discount.effectiveDiscountPct * 100)}% ของยอด */}
                   {discount.capped ? " · ส่วนลดไม่ถึง 60%" : ""}
                 </p>
               </div>
